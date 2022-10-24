@@ -8,46 +8,58 @@ let socket = io.connect(`${endPoint}`);
 */}
 var io = require("socket.io-client");
 
-console.log("HI, Here 1");
+// console.log("HI, Here 1");
 
 var socket = io.connect('http://54.160.93.120',{ path :'/api/socket.io'});
 
 socket.on('connect_error', function(){console.log("failed")});
 socket.on('connection',() => {console.log(socket);});
 socket.send("Connected");
-console.log("HI, Here 2",socket, socket.connected);
+// console.log("HI, Here 2",socket, socket.connected);
+
+socket.on("error", args => {
+  alert("Received error from backend: " + args);
+});
+
+// Move socket.on(*) outside to avoid creating multiple listeners and thus 
+// resulting in multiple responses.
+// See https://stackoverflow.com/questions/32265731/socket-io-emits-multiple-times
+var history;
+const login = function(args){
+  if (!args["valid"]) {
+    console.log("Logged in failed");
+    alert("Invalid login. Check your input.");
+  }
+  else {
+    // setListener(args["is_listener"]);
+    console.log("Logged in successfully");
+    let room = args["is_listener"]
+    let type = args["show_suggestions"]
+    if (room && type) {
+      history.push(`/room?type=${"listener2"}`);
+    } else if (room) {
+      history.push(`/room?type=${"listener1"}`);
+    } else {
+      history.push(`/room?type=${"client"}`);
+    }
+  }
+};
+
+socket.on("login_response", args => {
+  console.log("login response")
+  try {login(args)} catch(e) {
+    console.error(e);
+    login(args)
+  }
+});
+
 const Home = () => {
-  const history = useHistory()
+  history = useHistory()
   const [chat_id, setChatId] = React.useState("");
   const [user_id, setUserId] = React.useState("");
   const listenerCode = "listener";
   const clientCode = "client";
   //const validIds = ["listener7", "client8"]
-
-  socket.on("error", args => {
-    alert("Received error from backend: " + args);
-  });
-
-  socket.on("login_response", args => {
-    console.log("login response")
-    if (!args["valid"]) {
-      console.log("Logged in failed");
-      alert("Invalid login. Check your input.");
-    }
-    else {
-      // setListener(args["is_listener"]);
-      console.log("Logged in successfully");
-      let room = args["is_listener"]
-      let type = args["show_suggestions"]
-      if (room && type) {
-        history.push(`/room?type=${"listener2"}`);
-      } else if (room) {
-        history.push(`/room?type=${"listener1"}`);
-      } else {
-        history.push(`/room?type=${"client"}`);
-      }
-    }
-  });
 
   const handleChatIDChange = (event) => {
     setChatId(event.target.value);
