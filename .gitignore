@@ -1,0 +1,10 @@
+# Reference: https://github.com/github/gitignore/blob/main/Node.gitignore
+
+# Logs
+*.log
+
+# Dependency directories
+node_modules/
+
+# dotenv environment variable files
+.env
