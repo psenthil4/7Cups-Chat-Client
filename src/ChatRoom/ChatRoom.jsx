@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ScrollToBottom from 'react-scroll-to-bottom';
+import Modal from 'react-modal';
 import io from "socket.io-client";
 import "./ChatRoom.css";
 import {
@@ -10,7 +11,7 @@ import {
   AlertDialogContent,
 } from "@reach/alert-dialog";
 
-let endPoint = "http://172.31.58.92:8000/";
+// let endPoint = "http://localhost:8000/";
 // let socket = io.connect(`${endPoint}`);
 
 const ChatRoom = (props) => {
@@ -21,10 +22,11 @@ const ChatRoom = (props) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [suggestionMessage, setSuggestionMessage] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState(["Grounding"]);
   const [suggestion, setSuggestion] = useState("");
   const [predictions, setPredictions] = useState([]);
   const [showDialog, setShowDialog] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const close = () => setShowDialog(false);
   const cancelRef = React.useRef();
   const data = {
@@ -43,7 +45,7 @@ const ChatRoom = (props) => {
   const messageRef = useRef()
 
   useEffect(() => {
-    socketRef.current = io.connect(`${endPoint}`);
+    socketRef.current = io.connect('http://54.160.93.120',{path:'/api/socket.io'});
     socketRef.current.on("error", args => {
       alert("Received error from backend: " + args);
     });
@@ -104,7 +106,7 @@ const ChatRoom = (props) => {
   const onSelectSuggestion = x => {
     setSuggestion(x);
     setSuggestionMessage(data[x]);
-    setShowDialog(true);
+    toggleModal();
   };
 
   const onDumpLogs = () => {
@@ -118,6 +120,10 @@ const ChatRoom = (props) => {
   // useEffect(() => {
   //   messageRef?.current.scrollIntoView({behavior: "smooth"})
   // }, [messages])
+
+  const toggleModal = () => {
+    setIsOpen(!isOpen);
+  }
 
   return (
     <>
@@ -165,13 +171,20 @@ const ChatRoom = (props) => {
             <div className="chat__strategies-group">
               {suggestions.map(i => (<button onClick={() => onSelectSuggestion(i)} className="chat__strategies-button">{i}</button>))}
               {showDialog && (
-                <AlertDialog className = "alert-buttons" leastDestructiveRef={cancelRef}>
+                // <AlertDialog className = "alert-buttons" leastDestructiveRef={cancelRef}>
 
-                  <AlertDialogLabel className = "alert-dialog">{suggestion}: {suggestionMessage}</AlertDialogLabel>
-                  <button ref={cancelRef} onClick={close} className="alert_button">
-                      Click to continue
-                  </button>
-                </AlertDialog>
+                //   <AlertDialogLabel className = "alert-dialog">{suggestion}: {suggestionMessage}</AlertDialogLabel>
+                //   <button ref={cancelRef} onClick={close} className="alert_button">
+                //       Click to continue
+                //   </button>
+                // </AlertDialog>
+                <Modal className = "dialog-modal"
+                  isOpen={isOpen}
+                  onRequestClose={toggleModal}
+                  contentLabel="Suggestion Description"
+                >
+                  <div>{suggestion}: {suggestionMessage}</div>
+                </Modal>
               )}
             </div>
           </div>}
