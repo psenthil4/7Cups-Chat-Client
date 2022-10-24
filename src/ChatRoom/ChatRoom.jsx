@@ -10,8 +10,8 @@ import {
   AlertDialogContent,
 } from "@reach/alert-dialog";
 
-let endPoint = "http://172.31.58.92:8000/";
-// let socket = io.connect(`${endPoint}`);
+
+
 
 const ChatRoom = (props) => {
   // const { is_listener } = props.match.params;
@@ -43,7 +43,7 @@ const ChatRoom = (props) => {
   const messageRef = useRef()
 
   useEffect(() => {
-    socketRef.current = io.connect(`${endPoint}`);
+    socketRef.current = io.connect('http://54.160.93.120',{path:'/api/socket.io'});
     socketRef.current.on("error", args => {
       alert("Received error from backend: " + args);
     });

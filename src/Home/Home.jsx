@@ -1,11 +1,21 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import io from "socket.io-client";
+
 import "./Home.css";
 
-let endPoint = "http://172.31.58.92:8000/";
+{/*let endPoint = "http://54.160.93.120/api";
 let socket = io.connect(`${endPoint}`);
+*/}
+var io = require("socket.io-client");
 
+console.log("HI, Here 1");
+
+var socket = io.connect('http://54.160.93.120',{ path :'/api/socket.io'});
+
+socket.on('connect_error', function(){console.log("failed")});
+socket.on('connection',() => {console.log(socket);});
+socket.send("Connected");
+console.log("HI, Here 2",socket, socket.connected);
 const Home = () => {
   const history = useHistory()
   const [chat_id, setChatId] = React.useState("");
