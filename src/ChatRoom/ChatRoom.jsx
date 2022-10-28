@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import ScrollToBottom from 'react-scroll-to-bottom';
-import Modal from 'react-modal';
 import io from "socket.io-client";
 import "./ChatRoom.css";
+import Modal from "react-modal";
 import {
   AlertDialog,
   AlertDialogLabel,
@@ -11,8 +11,7 @@ import {
   AlertDialogContent,
 } from "@reach/alert-dialog";
 
-// let endPoint = "http://localhost:8000/";
-// let socket = io.connect(`${endPoint}`);
+Modal.setAppElement("#root");
 
 const ChatRoom = (props) => {
   // const { is_listener } = props.match.params;
@@ -30,14 +29,14 @@ const ChatRoom = (props) => {
   const close = () => setShowDialog(false);
   const cancelRef = React.useRef();
   const data = {
-    "Grounding": "Use a short, neutral phrase to continue the conversation",
-    "Open Question": "Pose a question to seek open ended information from the client",
-    "Closed Question": "Pose a question to seek specific information from the client",
-    "Introduction/Greeting" : "Greet or exchange introductions with the client",
-    "Affirm" : "Offer positive feedback regarding the client's actions",
-    "Persuade" : "Offer logical points to the client's conversation",
-    "Reflection" : "Reflect on something the client has said",
-    "Support" : "Be sympathetic towards the client's circumstances",
+    "Grounding": "Use a short, neutral phrase to continue the conversation\n",
+    "Open Question": "Pose a question to seek open ended information from the client\nI understand you have some concerns. Can you tell me about them?",
+    "Closed Question": "Pose a question to seek specific information from the client\n",
+    "Introduction/Greeting" : "Greet or exchange introductions with the client\n",
+    "Affirm" : "Offer positive feedback regarding the client's actions\nThank you for hanging in there with me. I appreciate this is not easy for you to hear.",
+    "Persuade" : "Offer logical points to the client's conversation\n",
+    "Reflection" : "Reflect on something the client has said\n",
+    "Support" : "Be sympathetic towards the client's circumstances\n",
   }
   
   // const suggestions = ["nice message", "click this", "howdy"]
@@ -45,7 +44,7 @@ const ChatRoom = (props) => {
   const messageRef = useRef()
 
   useEffect(() => {
-    socketRef.current = io.connect('http://54.160.93.120',{path:'/api/socket.io'});
+    socketRef.current = io.connect('http://54.160.93.120',{path:'/api/socket.io', transports: ['polling']});
     socketRef.current.on("error", args => {
       alert("Received error from backend: " + args);
     });
@@ -123,6 +122,7 @@ const ChatRoom = (props) => {
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
+    console.log(true);
   }
 
   return (
@@ -169,8 +169,17 @@ const ChatRoom = (props) => {
         <section className="chat__strategies">
           {show_predictions && is_listener && suggestions.length > 0 && <div className="chat__strategies-container">
             <div className="chat__strategies-group">
-              {suggestions.map(i => (<button onClick={() => onSelectSuggestion(i)} className="chat__strategies-button">{i}</button>))}
-              {showDialog && (
+              {suggestions.map(i => (<button onClick={() => onSelectSuggestion(i)} className="chat__strategies-button" key = {i}>{i}</button>))}
+              <Modal
+                  style={{opacity:1}}
+                  isOpen={isOpen}
+                  onRequestClose={toggleModal}
+                  contentLabel="Suggestion Description"
+                >
+                  <div>{suggestion}: {suggestionMessage}</div>
+                  <button onClick={toggleModal}>Close</button>
+                </Modal>
+              {/* {showDialog && (
                 // <AlertDialog className = "alert-buttons" leastDestructiveRef={cancelRef}>
 
                 //   <AlertDialogLabel className = "alert-dialog">{suggestion}: {suggestionMessage}</AlertDialogLabel>
@@ -178,24 +187,24 @@ const ChatRoom = (props) => {
                 //       Click to continue
                 //   </button>
                 // </AlertDialog>
-                <Modal className = "dialog-modal"
-                  isOpen={isOpen}
+                <Modal
+                  style={{opacity:1}}
+                  isOpen={true}
                   onRequestClose={toggleModal}
                   contentLabel="Suggestion Description"
                 >
                   <div>{suggestion}: {suggestionMessage}</div>
                 </Modal>
-              )}
+              )} */}
             </div>
           </div>}
         </section>
         <section className="chat__suggestion">
           {show_predictions && is_listener && predictions.length > 0 && <div className="chat__suggestion-container">
             <div className="chat__suggestion-group">
-              {predictions.map(i => (<button onClick={() => onSelectPred(i)} className="chat__suggestion-button">{i}</button>))}
+              {predictions.map(i => (<button onClick={() => onSelectPred(i)} className="chat__suggestion-button" key = {i}>{i}</button>))}
             </div>
           </div>}
-
         </section>
         <section className="chat__input">
           <div className="chat__input-wrapper">
