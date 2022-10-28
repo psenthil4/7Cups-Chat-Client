@@ -177,7 +177,6 @@ const ChatRoom = (props) => {
                   contentLabel="Suggestion Description"
                 >
                   <div>{suggestion}: {suggestionMessage}</div>
-                  <button onClick={toggleModal}>Close</button>
                 </Modal>
               {/* {showDialog && (
                 // <AlertDialog className = "alert-buttons" leastDestructiveRef={cancelRef}>
